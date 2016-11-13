@@ -69,7 +69,7 @@ dataDump.calculateHx = function(){
 	this.inputPx.forEach(function(item){
 		Hx += item * Math.log2(item);
 	});
-	this.Hx = -Hx;
+	this.Hx = this.H = -Hx;
 };
 
 dataDump.calculateHmax = function(){

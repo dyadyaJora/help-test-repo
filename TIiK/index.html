@@ -2,27 +2,87 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Задание2</title>
+	<style>
+		body{
+			font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+		}
+		table {
+			font-size: 14px;
+			border-collapse: collapse;
+			text-align: center;
+		}
+		td {
+			border-style: solid;
+			border-width: 0 1px 1px 0;
+			border-color: white;
+			background: #6aff7d;
+			padding: 10px 20px;
+		}
+		tr:nth-child(2n) > td {
+			background: #00f74e;
+		}
+		.results{
+			margin: 10px;
+		}
+	</style>
 </head>
 <body>
+
+	<h1>Задание№2</h1>
+	<p>На вход ИУ с помехами подается совокупность сообщений x<sub>k</sub>, где k - от 1 до N. Вероятность сообщений на входе задается в виде счетчика случайных чисел. Вероятность безошибочной передачи сообщений составляет не менее 70% и задается в виде счетчика случайных чисел. Вероятность ошибки также задается случайным образом. Определить количество информации, полученное при неполной достоверности сообщений. </p>
+
+	N = <input type="text" value="26" disabled="true" id="N"> <br>
+	<label ><input type="checkbox" onchange="enbN();" >Изменять N</label><br>
 	<button onclick="func();">Рассчитать</button>
+
+	<div class="results">
+	<p>
+	Количество информации:
+		<span>I(x) = </span> <span id="I"></span>
+	</p>
+
+	<br>Массив вероятностей сообщений на входе<br>
+	<table id="px">
+	</table>
+	
+	<br>Матрица вероятностей переходов<br>
+	<table id="uslPxy">
+	</table>
+
+	<br>Массив вероятностей сообщений на выходе<br>
+	<table id="py">
+	</table>
+	</div>
+
 	<script src="lab2.js"></script>
 	<script>
+		function enbN() {
+			document.getElementById('N').disabled = !document.getElementById('N').disabled;
+		}
 		function func(){
-			N = 16;
-			eps = 0.000001;/*
-			dataDump.generateInputPx();
-			dataDump.generateUslownayaPxy();
-			dataDump.generateOutputPy();
-			dataDump.generateSowmestnayaPxy();
-			dataDump.calculateHx();
-			dataDump.calculateHmax();
-			dataDump.calculateHxy();
-
-			dataDump.calculateI();
-			*/
+			N = document.getElementById('N').value;
+			if(isNaN(N)) {
+				alert("Недопустимое значение N!!!");
+				return;
+			}
+			//погрешность для полученного значения вероятности
+			eps = 0.000001;
 			dataDump.makeCalc();
 
+			fillTableWithData();
+			consoleLogData();
+		}
+
+		function createCellElem(){
+			var elem = document.createElement("div");
+			elem.style.width = "200px";
+			elem.style.textAlign = "center";
+			elem.style.padding = "5px";
+			return elem;
+		}
+
+		function consoleLogData(){
 			console.log("input = ", dataDump.inputPx);
 			console.log("uslownaya = ", dataDump.uslPxy);
 			console.log("output = ", dataDump.outputPy);
@@ -31,6 +91,41 @@
 			console.log("Hmax = ", dataDump.Hmax);
 			console.log("Hxy = ", dataDump.Hxy);
 			console.log("I = ", dataDump.I);
+		}
+
+		function fillTableWithData(){
+			document.all.I.innerHTML = dataDump.I;
+			if(document.all.px.rows.length != 0) document.all.px.deleteRow(0);
+			document.all.px.insertRow();
+			if(document.all.py.rows.length != 0) document.all.py.deleteRow(0);
+			document.all.py.insertRow();
+			while(document.all.uslPxy.rows.length != 0){
+				document.all.uslPxy.deleteRow(0);
+			}
+			for (var i = 1; i <= N; i++) {
+
+				elem = createCellElem();
+
+				document.all.px.rows[0].insertCell(i-1);
+				elem.innerHTML = dataDump.inputPx[i];
+				document.all.px.rows[0].cells[i-1].appendChild(elem);
+
+
+				elem = createCellElem();
+
+				document.all.py.rows[0].insertCell(i-1);
+				elem.innerHTML = dataDump.outputPy[i];
+				document.all.py.rows[0].cells[i-1].appendChild(elem);
+
+				document.all.uslPxy.insertRow();
+				for (var j = 1; j <= N; j++) {
+					elem = createCellElem();
+
+					document.all.uslPxy.rows[i-1].insertCell(j-1);
+					elem.innerHTML = dataDump.uslPxy[i][j];
+					document.all.uslPxy.rows[i-1].cells[j-1].appendChild(elem);
+				}
+			}
 		}
 	</script>
 </body>
