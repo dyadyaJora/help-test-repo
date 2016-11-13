@@ -42,6 +42,16 @@
 		<span>I(x) = </span> <span id="I"></span>
 	</p>
 
+	<p>
+		Энтропия на входе:
+		<span>H(x) = </span> <span id="Hx"></span>
+	</p>
+
+	<p>
+		Остаточная энтропия:
+		<span>H(x/y) = </span> <span id="Hxy"></span>
+	</p>
+
 	<br>Массив вероятностей сообщений на входе<br>
 	<table id="px">
 	</table>
@@ -95,6 +105,8 @@
 
 		function fillTableWithData(){
 			document.all.I.innerHTML = dataDump.I;
+			document.all.Hx.innerHTML = dataDump.Hx;
+			document.all.Hxy.innerHTML = dataDump.Hxy;
 			if(document.all.px.rows.length != 0) document.all.px.deleteRow(0);
 			document.all.px.insertRow();
 			if(document.all.py.rows.length != 0) document.all.py.deleteRow(0);

@@ -38,6 +38,12 @@ describe("Результаты программы, анализируем пол
 		it("Программа генерирует разные значения" , function() {
 			assert.notEqual(x[i-1], x[i]);
 		});
+
+		it("Вероятность безошибочного перехода - более 70%" , function() {
+			for (var j = 1; j <= N ; j++) {
+				assert.isAtLeast(dataDump.uslPxy[j][j], 0.7);
+			}
+		});
 	}
 
 });
