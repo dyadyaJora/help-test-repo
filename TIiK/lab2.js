@@ -80,7 +80,6 @@ dataDump.calculateHxy = function(){
 	var Hxy = 0;
 	for (var i = 1; i <= N; i++) {
 		for (var j = 1; j <= N; j++) {
-			console.log(Math.log2(this.uslPxy[i][j]), this.uslPxy[i][j]);
 			Hxy += this.sowmPxy[i][j] * Math.log2(this.uslPxy[i][j]);
 		}
 	}
