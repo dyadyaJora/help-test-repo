@@ -62,3 +62,102 @@ DataClean.prototype.makeCalc = function() {
 	this.II = this._calculateII();
 	this.C = this._calculateC();
 };
+
+/**
+* @override
+* @protected
+*/
+DataInterference.prototype._calculateH = function(){
+	this.uslPyz = this._generateUslownayaPyz();
+	this.outputPz = this._generateOutputPz(this.inputPx);
+	this.sowmPyz = this._generateSowmestnayaPyz(this.outputPz);
+	this.Hy = this._calculateHx();
+	this.Hyz = this._calculateHyz(this.sowmPyz);
+	return Math.abs(this.Hy - this.Hyz);
+};
+
+/**
+* @override
+* @protected
+*/
+DataInterference.prototype._calculateC = function(){
+	var Hy = Math.log2(N),
+		input = [];
+	for (var i = 1; i <= N; i++) {
+		input[i] = 1 / N;
+	}
+	var outputPz = this._generateOutputPz(input);
+	var sowmPyz = this._generateSowmestnayaPyz(outputPz);
+	var Hyz = this._calculateHyz(sowmPyz);
+	return (Hy - Hyz) / this.tx;
+
+};
+
+DataInterference.prototype._generateUslownayaPyz = function(){
+	var p = [],
+		b,
+		pSum = 0,
+		q = 1 / N;
+	for (var i = 1; i <= N; i++) {
+		p[i] = [];
+		p[i][i] = 1 - q + q * Math.random();
+		b = 1 - p[i][i];
+		pSum = p[i][i];
+		for (var j = 1; j < N; j++) {
+			if(i != j) {
+				p[i][j] = b * Math.random();
+				//костыль связанный с погрешностью вычислений и вероятностью 0
+				p[i][j] = p[i][j] <= 0 ? eps : p[i][j];
+				//
+				b -= p[i][j];
+				pSum += p[i][j];
+			}
+		}
+		if(i!=N){
+			p[i][N] = 1 - pSum;
+			p[i][N] = p[i][N] <= 0 ? eps : p[i][N]
+		}
+	}
+	return p;
+};
+
+/**
+* @params {input: Array}
+*/
+DataInterference.prototype._generateOutputPz = function(input){
+	var p = [];
+	for (var j = 1; j <= N; j++) {
+		p[j] = 0;
+		for (var i = 1; i <= N; i++) {
+			p[j] += input[i] * this.uslPyz[i][j];
+		}
+	}
+	return p;
+};
+
+/**
+* @params {output: Array}
+*/
+DataInterference.prototype._generateSowmestnayaPyz = function(output){
+	var sowmPyz = [];
+	for (var i = 1; i <= N; i++) {
+		sowmPyz[i] = [];
+		for (var j = 1; j <= N; j++) {
+			sowmPyz[i][j] = output[j] * this.uslPyz[i][j];
+		}
+	}
+	return sowmPyz;
+};
+
+/**
+* @params {sowmPyz}
+*/
+DataInterference.prototype._calculateHyz = function(sowmPyz){
+	var Hyz = 0;
+	for (var i = 1; i <= N; i++) {
+		for (var j = 1; j <= N; j++) {
+			Hyz += sowmPyz[i][j] * Math.log2(this.uslPyz[i][j]);
+		}
+	}
+	return -Hyz;
+};

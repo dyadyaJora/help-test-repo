@@ -8,10 +8,14 @@
 <body>
 	
 	<script>
-	var N = 21, eps = 0.000000001
+	var N = 21, eps = 0.000000001, sum = 0;
 	var data = new DataClean(),
 		data2 = new DataInterference();
-		console.log(data._generateInputValue());
+	var x = data._generateInputValue();
+	x.forEach(function(item){
+		sum += item
+	});
+		console.log(x, sum);
 	</script>
 </body>
 </html>
