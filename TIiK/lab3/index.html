@@ -3,19 +3,158 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<style>
+		body{
+			font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+		}
+		table {
+			font-size: 14px;
+			border-collapse: collapse;
+			text-align: center;
+		}
+		td {
+			border-style: solid;
+			border-width: 0 1px 1px 0;
+			border-color: white;
+			background: #6aff7d;
+			padding: 10px 20px;
+		}
+		tr:nth-child(2n) > td {
+			background: #00f74e;
+		}
+		.results{
+			margin: 10px;
+		}
+	</style>
 	<script src="lab3.js"></script>
 </head>
 <body>
+	<h1>Задание№3</h1>
+	<p>На вход ИУ подается совокупность дискретных сообщений x<sub>k</sub>, где k - от 1 до N. Вероятность сообщений на входе задается в виде счетчика случайных чисел. Длительность каждого из сообщений T<sub>x</sub>  в диапазоне [ 1 .. N] и также задается в виде счетчика случайных чисел. Вероятность безошибочной передачи сообщений составляет не менее 70% и задается в виде счетчика случайных чисел. Рассчитать:</p>
+	<ol>
+		<li>Скорость передачи и пропускную способность в канале без помех</li>
+		<li>Скорость передачи и пропускную способность в канале с помехами, при условии того, что общая ошибка для каждого сообщения не превосходит величины q = 1/N</li>
+	</ol> 
+
+	N = <input type="text" value="21" disabled="true" id="N"> <br>
+	<label ><input type="checkbox" onchange="enbN();" >Изменять N</label><br>
+	<button onclick="func();">Рассчитать</button>
+
+	<div class="results">
+	<p>
+		q = <span id="q"></span>
+	</p>
+	<br>Массив вероятностей сообщений на входе<br>
+	<table id="px">
+	</table>
+
+	<br>Массив длительностей сообщений на входе<br>
+	<table id="tx">
+	</table>
+
+	<h2>В канале без помех</h2>
+	<p>
+	Скорость ввода информации в канал:
+		<span>&#206;(x) = </span> <span id="II"></span>
+	</p>
+
+	<p>
+	Пропускная способность:
+		<span>C = </span> <span id="C"></span>
+	</p>
+
+	<h2>В канале c  помехами</h2>
+	<p>
+	Скорость ввода информации в канал:
+		<span>&#206;(x) = </span> <span id="II2"></span>
+	</p>
+
+	<p>
+	Пропускная способность:
+		<span>C = </span> <span id="C2"></span>
+	</p>
+
+	<br>Матрица вероятностей переходов<br>
+	<table id="uslPyz">
+	</table>
+	</div>
 	
 	<script>
-	var N = 21, eps = 0.000000001, sum = 0;
-	var data = new DataClean(),
-		data2 = new DataInterference();
-	var x = data._generateInputValue();
-	x.forEach(function(item){
-		sum += item
-	});
-		console.log(x, sum);
+		var N, eps, inputPx, inputTx, data, data2;
+		function enbN() {
+			document.getElementById('N').disabled = !document.getElementById('N').disabled;
+		}
+		function func(){
+			N = document.getElementById('N').value;
+			if(isNaN(N)) {
+				alert("Недопустимое значение N!!!");
+				return;
+			}
+			//погрешность для полученного значения вероятности
+			eps = 0.000001;
+			//генерация входных данных
+			inputPx = generateInputValue();
+			inputTx = generateInputValue();
+
+			data = new DataClean(inputPx, inputTx);
+			data2 = new DataInterference(inputPx, inputTx);
+
+			data.makeCalc();
+			data2.makeCalc();
+
+			document.all.q.innerHTML = 1 / N;
+			document.all.II.innerHTML = data.II;
+			document.all.C.innerHTML = data.C;
+			if(document.all.px.rows.length != 0) document.all.px.deleteRow(0);
+			document.all.px.insertRow();
+
+			document.all.II2.innerHTML = data2.II;
+			document.all.C2.innerHTML = data2.C;
+			if(document.all.tx.rows.length != 0) document.all.tx.deleteRow(0);
+			document.all.tx.insertRow();
+			while(document.all.uslPyz.rows.length != 0){
+				document.all.uslPyz.deleteRow(0);
+			}
+
+			for (var i = 1; i <= N; i++) {
+
+				elem = createCellElem();
+
+				document.all.px.rows[0].insertCell(i-1);
+				elem.innerHTML = data.inputPx[i];
+				document.all.px.rows[0].cells[i-1].appendChild(elem);
+
+				elem = createCellElem();
+
+				document.all.tx.rows[0].insertCell(i-1);
+				elem.innerHTML = data.inputTx[i];
+				document.all.tx.rows[0].cells[i-1].appendChild(elem);
+
+				document.all.uslPyz.insertRow();
+				for (var j = 1; j <= N; j++) {
+					elem = createCellElem();
+
+					document.all.uslPyz.rows[i-1].insertCell(j-1);
+					elem.innerHTML = data2.uslPyz[i][j];
+					document.all.uslPyz.rows[i-1].cells[j-1].appendChild(elem);
+				}
+			}
+
+			console.log("Данные для канала без помех:", data);
+			console.log("Данные для канала с помехами:", data2);
+
+		}
+
+		function createCellElem(){
+			var elem = document.createElement("div");
+			elem.style.width = "200px";
+			elem.style.textAlign = "center";
+			elem.style.padding = "5px";
+			return elem;
+		}
+
+		
+
 	</script>
 </body>
 </html>
