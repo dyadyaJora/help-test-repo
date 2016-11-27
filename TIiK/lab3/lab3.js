@@ -1,14 +1,4 @@
-function DataClean(){
-	this.a = 10;
-}
-
-function DataInterference(){
-	this.a = 10;
-}
-
-DataInterference.prototype = Object.create(DataClean.prototype);
-
-DataClean.prototype._generateInputValue = function(){
+function generateInputValue(){
 	var a = [], 
 		b = 1,
 		aSum = 0;
@@ -22,6 +12,17 @@ DataClean.prototype._generateInputValue = function(){
 	a[N] = a[N] <= 0? eps : a[N];
 	return a;
 };
+
+function DataClean(inputPx, inputTx){
+	this.inputPx = inputPx;
+	this.inputTx = inputTx;
+}
+
+function DataInterference(inputPx, inputTx){
+	DataClean.apply(this, arguments);
+}
+
+DataInterference.prototype = Object.create(DataClean.prototype);
 
 
 DataClean.prototype._calculateH = function(){
@@ -55,10 +56,7 @@ DataClean.prototype._calculateC = function(){
 	return Math.log2(N) / this.tx;
 };
 
-
 DataClean.prototype.makeCalc = function() {
-	this.inputPx = this._generateInputValue();
-	this.inputTx = this._generateInputValue();
 	this.II = this._calculateII();
 	this.C = this._calculateC();
 };
