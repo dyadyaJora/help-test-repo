@@ -3,7 +3,12 @@ var dataDump = {
 	Pnk : [],
 	Uk : [],
 	Hkp : [],
-	H : []
+	H : [],
+	message : [],
+	sums : [],
+	sysB : [],
+	sysKod : [],
+	controlSum : []
 };
 
 dataDump._findN = function() {
@@ -76,6 +81,69 @@ dataDump._generateH = function() {
 
         this.H[i] = HkpT[i].concat(Up[i]);
     }
+    this.Up = Up;
+};
+
+dataDump.generateInputMessage = function() {
+	for (var i = 0; i < this.k; i++) {
+		this.message[i] = Math.floor(Math.random() * 2) + "";
+	}
+};
+
+dataDump._findSums = function() {
+	for (var i = 0; i < this.p; i++) {
+		this.sums[i] = [];
+		var pos = 0;
+		while (true) {
+			var foundPos = this.H[i].indexOf("1", pos);
+			if (foundPos == -1) break;
+
+			this.sums[i].push(foundPos);
+  			pos = foundPos + 1; // продолжить поиск со следующей
+		}
+	}
+};
+
+dataDump.generateSystKod = function() {
+	var x = 0;
+	for (var i = 0; i < this.p; i++) {
+		for (var j = 0; j < this.sums[i].length - 1; j++) {
+			x = x ^ +this.message[this.sums[i][j]];
+		}
+		this.sysB[i] = x + "";
+	}
+
+	this.sysKod = this.message.concat(this.sysB);
+};
+
+dataDump._generateError = function() {
+	this.pos =  Math.floor(Math.random() * this.n);
+	this.messageWithError = this.message;
+	this.messageWithError[this.pos] = this.messageWithError[this.pos]? "0" : "1";
+};
+
+dataDump._findError = function() {
+	var x = 0;
+	for (var i = 0; i < this.p; i++) {
+		for (var j = 0; j < this.sums[i].length; j++) {
+			x = x ^ +this.messageWithError[this.sums[i][j]];
+		}
+		this.controlSum[i] = x + "";
+	}
+
+	var cS = this.controlSum.join('');
+
+	for (var i = 0; i < this.k; i++) {
+		if(cS == this.Hkp[i].join(''))
+			return i;
+	}
+
+	for (var i = 0; i < this.p; i++) {
+		if(cS == this.Up[i].join(''))
+			return i + this.k;
+	}
+
+	return  false;//this.p;
 };
 
 dataDump.makeCalc = function() {
@@ -86,5 +154,12 @@ dataDump.makeCalc = function() {
 	this._generatePnk();
 	this._generateH();
 
+	this._findSums();
 
+	this.generateInputMessage();
+	this.generateSystKod();
+
+	this._generateError();
+
+	this.errorPos = this._findError();
 };
